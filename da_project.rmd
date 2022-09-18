@@ -1,0 +1,128 @@
+---
+title: "project"
+output: html_document
+date: "2022-09-17"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+#importing
+
+```{r}
+library(tidyverse)
+library(readr)
+library(ROCR)
+library(PerformanceAnalytics)
+library(e1071)
+library(caret)
+library(gbm)
+library(corrplot)
+library(ggcorrplot)
+library(MASS)
+library(rpart)
+library(caTools)
+library(naivebayes)
+library(class)
+library(ISLR)
+library(glmnet)
+library(Hmisc)
+library(funModeling)
+library(pROC)
+library(randomForest)
+library(klaR)
+library(scales)
+library(cluster)
+library(factoextra)
+library(DataExplorer)
+library(ClustOfVar)
+library(GGally)
+library(DescTools) #For Mode function inbuilt
+```
+#Loading frame 
+```{r}
+melb_df <- read_csv('melb_data.csv')
+
+```
+#Missing data 
+```{r}
+plot_missing(melb_df)
+```
+#Dropping where missing data is high 
+```{r}
+
+sum(is.na((melb_df2$Car)))
+my_mode <- function(x) {                     # Create mode function 
+  unique_x <- unique(x)
+  tabulate_x <- tabulate(match(x, unique_x))
+  unique_x[tabulate_x == max(tabulate_x)]
+}
+my_mode(melb_df2$Car)
+
+melb_df2 <- melb_df2 %>%
+   mutate(Cars_new  = ifelse(is.na(Car), my_mode(Car), Car))
+melb_df2 <- subset(melb_df, select = -c(CouncilArea,YearBuilt,BuildingArea,Car) )
+plot_missing(melb_df2)
+
+```
+#Summary Statistics
+```{r}
+summary(melb_df2)
+```
+
+```{r}
+boxplot(melb_df2[,9:15])
+
+```
+#PCA
+```{r}
+pca <- prcomp(melb_df2[,9:14], scale = TRUE)
+screeplot(pca)
+
+fviz_screeplot(pca)
+
+pca$sdev^2#comp var
+pca$rotation <- -pca$rotation
+pca$x <- -pca$x
+pca
+fviz_pca(pca)
+s_df <- apply(melb_df2[,9:14], 2, scale)
+head(s_df)
+cov_df <- cov(s_df)
+cov_df
+ei_df <- eigen(cov_df)
+ei_df
+str(ei_df)
+ei_df$vectors[,1:2]
+p <- ei_df$vectors[,1:2]
+p <- -p
+row.names(p) <- c("Distance","Postcode","Bedroom2","Bathroom","Landsize","Lattitude")
+colnames(p) <- c("PC1","PC2")
+p
+avo <- ei_df$values / sum(ei_df$values)
+round(avo, 2)
+```
+```{r}
+
+```
