@@ -1,0 +1,220 @@
+---
+title: "da_proj_india"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+library(ROCR)
+library(PerformanceAnalytics)
+library(e1071)
+library(caret)
+library(gbm)
+library(corrplot)
+library(ggcorrplot)
+library(MASS)
+library(rpart)
+library(caTools)
+library(naivebayes)
+library(class)
+library(ISLR)
+library(glmnet)
+library(Hmisc)
+library(funModeling)
+library(pROC)
+library(randomForest)
+library(klaR)
+library(scales)
+library(cluster)
+library(factoextra)
+library(DataExplorer)
+library(ClustOfVar)
+library(GGally)
+library(DescTools)
+```
+
+###Loading datasets for Indian cities (all have same format)
+
+```{r}
+setwd("C:\\Users\\tarun\\Desktop\\da_proj")
+df_bangalore <- read.csv("Bangalore.csv")
+df_chennai <- read.csv("Chennai.csv")
+df_delhi <- read.csv("Delhi.csv")
+df_hyderabad <- read.csv("Hyderabad.csv")
+df_mumbai <- read.csv("Mumbai.csv")
+```
+
+
+###Checking %null values
+```{r}
+print("Bangalore dataset missing values")
+plot_missing(df_bangalore)
+print("Chennai dataset missing values")
+plot_missing(df_chennai)
+print("Delhi dataset missing values")
+plot_missing(df_delhi)
+print("Hyderabad dataset missing values")
+plot_missing(df_hyderabad)
+print("Mumbai dataset missing values")
+plot_missing(df_mumbai)
+```
+
+
+#Since there are no missing values, moving on to PCA
+#For Bangalore
+```{r}
+res_bangalore <- prcomp(df_bangalore[c("Price","No..of.Bedrooms","Area")], scale. = T)
+res_bangalore$rotation <- -1*res_bangalore$rotation
+res_bangalore$rotation
+```
+
+```{r}
+res_bangalore$x <- -1*res_bangalore$x
+head(res_bangalore$x)
+```
+
+```{r}
+biplot(res_bangalore)
+```
+#Since biplot doesnt show any clear depiction for each of the data, it is not displayed for the other cities.
+
+
+```{r}
+var_exp_bangalore <- res_bangalore$sdev^2 / sum(res_bangalore$sdev^2)
+var_exp_bangalore
+```
+
+#1st component explains 64.86% of total variance, 2nd component explains 26.95% of total variance and 3rd component explains 8.18%
+
+
+#scree plot
+```{r}
+qplot(c(1:3), var_exp_bangalore) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab("Variance Explained") +
+  ggtitle("Scree Plot Bangalore") +
+  ylim(0, 1)
+```
+
+#For Chennai
+```{r}
+res_chennai <- prcomp(df_chennai[c("Price","No..of.Bedrooms","Area")], scale. = T)
+res_chennai$rotation <- -1*res_chennai$rotation
+res_chennai$rotation
+
+```
+
+
+
+```{r}
+res_chennai$x <- -1*res_chennai$x
+head(res_chennai$x)
+```
+
+
+```{r}
+var_exp_chennai <- res_chennai$sdev^2 / sum(res_chennai$sdev^2)
+var_exp_chennai
+```
+```{r}
+qplot(c(1:3), var_exp_chennai) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab("Variance Explained") +
+  ggtitle("Scree Plot Chennai") +
+  ylim(0, 1)
+```
+
+
+#For Delhi
+```{r}
+res_delhi <- prcomp(df_delhi[c("Price","No..of.Bedrooms","Area")], scale. = T)
+res_delhi$rotation <- -1*res_delhi$rotation
+res_delhi$rotation
+```
+
+
+```{r}
+res_delhi$x <- -1*res_delhi$x
+head(res_delhi$x)
+```
+
+
+```{r}
+var_exp_delhi <- res_delhi$sdev^2 / sum(res_delhi$sdev^2)
+var_exp_delhi
+```
+
+
+```{r}
+qplot(c(1:3), var_exp_delhi) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab("Variance Explained") +
+  ggtitle("Scree Plot Delhi") +
+  ylim(0, 1)
+```
+
+
+#For Hyderabad
+```{r}
+res_hyderabad <- prcomp(df_hyderabad[c("Price","No..of.Bedrooms","Area")], scale. = T)
+res_hyderabad$rotation <- -1*res_hyderabad$rotation
+res_hyderabad$rotation
+```
+
+
+```{r}
+res_hyderabad$x <- -1*res_hyderabad$x
+head(res_hyderabad$x)
+```
+
+
+```{r}
+var_exp_hyderabad <- res_hyderabad$sdev^2 / sum(res_hyderabad$sdev^2)
+var_exp_hyderabad
+```
+
+```{r}
+qplot(c(1:3), var_exp_hyderabad) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab("Variance Explained") +
+  ggtitle("Scree Plot Hyderabad") +
+  ylim(0, 1)
+```
+
+
+#For Mumbai
+```{r}
+res_mumbai <- prcomp(df_mumbai[c("Price","No..of.Bedrooms","Area")], scale. = T)
+res_mumbai$rotation <- -1*res_mumbai$rotation
+res_mumbai$rotation
+```
+
+
+```{r}
+res_mumbai$x <- -1*res_mumbai$x
+head(res_mumbai$x)
+```
+
+```{r}
+var_exp_mumbai <- res_mumbai$sdev^2 / sum(res_mumbai$sdev^2)
+var_exp_mumbai
+```
+
+```{r}
+qplot(c(1:3), var_exp_mumbai) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab("Variance Explained") +
+  ggtitle("Scree Plot Mumbai") +
+  ylim(0, 1)
+```
+
+
